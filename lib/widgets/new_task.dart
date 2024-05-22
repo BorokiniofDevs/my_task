@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_task/model/task.dart';
+import 'package:my_task/widgets/add_button.dart';
 
 class NewTask extends StatefulWidget {
   const NewTask({super.key, required this.onAdd});
@@ -15,6 +16,8 @@ class NewTask extends StatefulWidget {
 
 class _NewTaskState extends State<NewTask> {
   final _inputController = TextEditingController();
+  Category selectedCategory = Category.work;
+  Duration? timer;
 
   @override
   void dispose() {
@@ -41,8 +44,15 @@ class _NewTaskState extends State<NewTask> {
       return;
     }
     // ALLOW USE OF ADD FUNC
-    widget.onAdd(Task(input: _inputController.text));
+    widget.onAdd(
+      Task(
+        input: _inputController.text,
+        category: selectedCategory,
+        // duration: timer!,
+      ),
+    );
     // Navigator.pop(context);
+    _inputController.clear();
   }
 
   @override
@@ -67,11 +77,15 @@ class _NewTaskState extends State<NewTask> {
               contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
               hintStyle: TextStyle(color: Color.fromARGB(108, 5, 66, 7)),
               enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                      color: Color.fromARGB(108, 5, 66, 7), width: 2),
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      topRight: Radius.circular(20))),
+                borderSide:
+                    BorderSide(color: Color.fromARGB(108, 5, 66, 7), width: 2),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(10),
+                  topRight: Radius.circular(
+                    20,
+                  ),
+                ),
+              ),
               focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
                       color: Color.fromARGB(173, 104, 129, 34), width: 2),
@@ -83,20 +97,33 @@ class _NewTaskState extends State<NewTask> {
         const SizedBox(
           height: 10,
         ),
-        ElevatedButton(
-          onPressed: _submittask,
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 40),
-            backgroundColor: const Color.fromARGB(255, 19, 128, 104),
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+        Row(
+          children: [
+            AddButton(
+                action: _submittask,
+                buttonText: 'Add task',
+                color: const Color.fromARGB(255, 19, 128, 104)),
+            const SizedBox(
+              width: 10,
             ),
-          ),
-          child: const Text(
-            'Add task',
-            textAlign: TextAlign.center,
-          ),
+            DropdownButton(
+              value: selectedCategory,
+              items: Category.values
+                  .map((category) => DropdownMenuItem(
+                      value: category, child: Text(category.name)))
+                  .toList(),
+              onChanged: (value) {
+                if (value == null) {
+                  return;
+                }
+                setState(() {
+                  selectedCategory = value;
+                });
+              },
+              borderRadius: BorderRadius.circular(10),
+              dropdownColor: Colors.green,
+            )
+          ],
         ),
       ],
     );
